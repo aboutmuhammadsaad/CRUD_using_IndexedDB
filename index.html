@@ -1,0 +1,203 @@
+
+<!-- CRUD using IndexedDB -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="bootstrap/bootstrap-5.0.2-dist/css/bootstrap.min.css">    
+    <script src="bootstrap/bootstrap-5.0.2-dist/js/bootstrap.min.js"></script> 
+    <title>IndexedDB</title>
+</head>
+<body>
+    <div class="container">
+        <button type="button" class="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#exampleModal">Add New</button>
+        <span id="conn"></span>
+        <br><br>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Gender</th>
+                    <th scope="col">Vehicle</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody id="itemsTable">
+
+            </tbody>
+        </table>        
+    </div>  
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Register Page</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="modalform">
+                    <div class="modal-body">
+                        <span class="text-success" id="res"></span>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstname" class="form-label">First Name </label>
+                                <input type="text" name="firstname" class="form-control border-dark" id="firstname" placeholder="First Name"><br>
+                                <span id="errorfirstname" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastname" class="form-label">Last Name </label>
+                                <input type="text" name="lastname" class="form-control border-dark" id="lastname" placeholder="Last Name"><br>
+                                <span id="errorlastname" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email </label>
+                                <input type="email" name="email" class="form-control border-dark" id="email" placeholder="xyz@gmail.com"><br>
+                                <span id="erroremail" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone </label>
+                                <input type="number" name="phone" class="form-control border-dark" id="phone" placeholder="0000000000" min="8"><br>
+                                <span id="errorphone" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="date" class="form-label">Date </label>
+                                <input type="date" name="date" class="form-control border-dark" id="date"><br>
+                                <span id="errordate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="vehicle" class="form-label">Type of Transport: </label>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input border-dark messageCheckbox" name="vehicle" id="check1" value="bike">
+                                    <label for="vehicle" class="form-check-label ms-3"> I have a bike</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input border-dark messageCheckbox" name="vehicle" id="check2" value="car">
+                                    <label for="vehicle" class=" ms-3 form-check-label"> I have a car</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input border-dark messageCheckbox" name="vehicle" id="check3" value="bike&car">
+                                    <label for="vehicle" class=" ms-3 form-check-label"> Both</label>
+                                </div>
+                                <span id="errorvehicle" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="gender" class="form-label">Gender </label>
+                                <div class="form-check">
+                                    <input type="radio" name="gender" id="radio1" class="form-check-input border-dark" value="female">
+                                    <label for="radio1" class="form-check-label">Female</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="radio" name="gender" id="radio2" class="form-check-input border-dark" value="male">
+                                    <label for="radio2" class="form-check-label"></label>Male
+                                </div>
+                                <span id="errorgender" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" id="subbtn" class="btn btn-primary savebtn">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Update Form</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="updateform">
+                    <div class="modal-body">
+                        <span class="text-success" id="ress"></span>
+                        <input type="hidden" name="id" id="idd">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fname" class="form-label">First Name </label>
+                                <input type="text" name="fname" class="form-control border-dark" id="fname" required placeholder="First Name"><br>
+                                <span id="errorfname" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lname" class="form-label">Last Name </label>
+                                <input type="text" name="lname" class="form-control border-dark" id="lname" required placeholder="Last Name"><br>
+                                <span id="errorlname" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="em" class="form-label">Email </label>
+                                <input type="email" name="em" class="form-control border-dark" id="em" required placeholder="xyz@gmail.com"><br>
+                                <span id="errorem" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ph" class="form-label">Phone </label>
+                                <input type="tel" name="ph" class="form-control border-dark" id="ph" required placeholder="0000000000" min="8"><br>
+                                <span id="errorph" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="date" class="form-label">Date </label>
+                                <input type="date" name="date" class="form-control border-dark" id="dte" ><br>
+                                <span id="edate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="vehicle" class="form-label">Type of Transport: </label>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input border-dark messageCheckbox" name="vehicle" id="chk1" value="bike" >
+                                    <label for="vehicle" class="form-check-label ms-3"> I have a bike</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input border-dark messageCheckbox" name="vehicle" id="chk2" value="car">
+                                    <label for="vehicle" class=" ms-3 form-check-label"> I have a car</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input border-dark messageCheckbox" name="vehicle" id="chk3" value="bike&car">
+                                    <label for="vehicle" class=" ms-3 form-check-label"> Both</label>
+                                </div>
+                                <span id="evehicle" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="gender" class="form-label">Gender </label>
+                                <div class="form-check">
+                                    <input type="radio" name="gender" id="radiof" class="form-check-input border-dark" value="female">
+                                    <label for="radio1" class="form-check-label">Female</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="radio" name="gender" id="radiom" class="form-check-input border-dark" value="male" > 
+                                    <label for="radio2" class="form-check-label"></label>Male
+                                </div>
+                                <span id="egender" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary updatebtn" id="subUpdateBtn">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+  <!-- <script src="script.js"></script> -->
+  <script src="script1.js"></script>
+</body>
+</html>
